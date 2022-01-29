@@ -193,6 +193,13 @@ func (c *aliDNSProviderSolver) Reconcile(ch *v1alpha1.ChallengeRequest) error {
 		return err
 	}
 
+	// check configuration
+	if cfg.AccessKeySecret == "" || cfg.AccessKeyID == "" {
+		err = fmt.Errorf("accessKeySecret or accessKeyID is empty")
+		log.Error(err, "invalid config")
+		return err
+	}
+
 	client, err := alidns.NewClientWithAccessKey(cfg.RegionID, cfg.AccessKeyID, cfg.AccessKeySecret)
 	if err != nil {
 		return err

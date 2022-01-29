@@ -46,7 +46,7 @@ spec:
             solverName: alidns-solver
             config:
               regionId: ""                 # optional
-              secretKeySecretRef:
+              apiKeySecretRef:
                 name: alidns-secret
 EOF
 ```
@@ -54,7 +54,7 @@ EOF
 or you can set AccsessKey in webhook configuration directly (**use as your own risk**):
 
 ```diff
--              secretKeySecretRef:
+-              apiKeySecretRef:
 -                name: alidns-secret
 +              accessKeyID: "<accessKeyID>"
 +              accessKeySecret: "<accessKeySecret>"
