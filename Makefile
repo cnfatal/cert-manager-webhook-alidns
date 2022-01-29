@@ -1,8 +1,8 @@
 OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
-IMAGE_NAME := "fatalc/cert-manager-webhook-alidns"
-IMAGE_TAG := "latest"
+IMAGE_NAME := fatalc/cert-manager-webhook-alidns
+IMAGE_TAG := latest
 
 OUT := $(shell pwd)/_out
 
@@ -27,7 +27,10 @@ clean-kubebuilder:
 	rm -Rf _test/kubebuilder
 
 build:
-	buildah bud -t "$(IMAGE_NAME):$(IMAGE_TAG)" .
+	buildah bud -t $(IMAGE_NAME):$(IMAGE_TAG) .
+
+push:
+	buildah push $(IMAGE_NAME):$(IMAGE_TAG) docker://$(IMAGE_NAME):$(IMAGE_TAG)
 
 .PHONY: rendered-manifest.yaml
 rendered-manifest.yaml:
