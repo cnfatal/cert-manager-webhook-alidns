@@ -11,7 +11,7 @@ metadata:
     release: cert-manager-webhook-alidns
     heritage: Helm
 ---
-# Source: cert-manager-webhook-alidns/templates/rbac.yaml
+# Source: cert-manager-webhook-alidns/templates/domain-solver.yaml
 # Grant cert-manager permission to validate using our apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -30,7 +30,28 @@ rules:
     verbs:
       - 'create'
 ---
-# Source: cert-manager-webhook-alidns/templates/rbac.yaml
+# Source: cert-manager-webhook-alidns/templates/flowcontrol-solver.yaml
+# API Priority and Fairness
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cert-manager-webhook-alidns:flowcontrol-solver
+  labels:
+    app: cert-manager-webhook-alidns
+    chart: cert-manager-webhook-alidns-0.1.0
+    release: cert-manager-webhook-alidns
+    heritage: Helm
+rules:
+  - apiGroups:
+      - "flowcontrol.apiserver.k8s.io"
+    resources:
+      - 'prioritylevelconfigurations'
+      - 'flowschemas'
+    verbs:
+      - 'list'
+      - 'watch'
+---
+# Source: cert-manager-webhook-alidns/templates/auth-delegator.yaml
 # apiserver gets the auth-delegator role to delegate auth decisions to
 # the core apiserver
 apiVersion: rbac.authorization.k8s.io/v1
@@ -52,7 +73,7 @@ subjects:
     name: cert-manager-webhook-alidns
     namespace: cert-manager
 ---
-# Source: cert-manager-webhook-alidns/templates/rbac.yaml
+# Source: cert-manager-webhook-alidns/templates/domain-solver.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -72,7 +93,46 @@ subjects:
     name: cert-manager
     namespace: cert-manager
 ---
+# Source: cert-manager-webhook-alidns/templates/flowcontrol-solver.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-webhook-alidns:flowcontrol-solver
+  labels:
+    app: cert-manager-webhook-alidns
+    chart: cert-manager-webhook-alidns-0.1.0
+    release: cert-manager-webhook-alidns
+    heritage: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-manager-webhook-alidns:flowcontrol-solver
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: cert-manager-webhook-alidns
+    namespace: cert-manager
+---
 # Source: cert-manager-webhook-alidns/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cert-manager-webhook-alidns:secret-solver
+  namespace: cert-manager
+  labels:
+    app: cert-manager-webhook-alidns
+    chart: cert-manager-webhook-alidns-0.1.0
+    release: cert-manager-webhook-alidns
+    heritage: Helm
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - 'secrets'
+    verbs:
+      - 'get'
+---
+# Source: cert-manager-webhook-alidns/templates/auth-reader.yaml
 # Grant the webhook permission to read the ConfigMap containing the Kubernetes
 # apiserver's requestheader-ca-certificate.
 # This ConfigMap is automatically created by the Kubernetes apiserver.
@@ -95,6 +155,26 @@ subjects:
     kind: ServiceAccount
     name: cert-manager-webhook-alidns
     namespace: cert-manager
+---
+# Source: cert-manager-webhook-alidns/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cert-manager-webhook-alidns:secret-solver
+  namespace: cert-manager
+  labels:
+    app: cert-manager-webhook-alidns
+    chart: cert-manager-webhook-alidns-0.1.0
+    release: cert-manager-webhook-alidns
+    heritage: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-manager-webhook-alidns:secret-solver
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: cert-manager
 ---
 # Source: cert-manager-webhook-alidns/templates/service.yaml
 apiVersion: v1
