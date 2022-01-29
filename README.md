@@ -18,13 +18,13 @@ kubectl apply -f https://raw.githubusercontent.com/fatalc/cert-manager-webhook-a
 
 ```sh
 # create alidns aksk secret
-kubectl -n cert-manager create secret generic alidns-secret --from-literal="access-token=<AccessKey ID>" --from-literal="secret-key=<AccessKey Secret>"
+kubectl -n cert-manager create secret generic alidns-secret --from-literal="access-key=<AccessKey ID>" --from-literal="secret-key=<AccessKey Secret>"
 ```
 
 Create the ACME issuer. for more information see <https://cert-manager.io/docs/configuration/acme/>
 
 ```sh
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl create --edit -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -63,7 +63,7 @@ or you can set AccsessKey in webhook configuration directly (**use as your own r
 Issue a certificate(optional)
 
 ```sh
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl create --edit -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
