@@ -28,17 +28,17 @@ cat <<EOF | kubectl create --edit -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-staging
+  name: letsencrypt
 spec:
   acme:
     # You must replace this email address with your own.
     # Let's Encrypt will use this to contact you about expiring
     # certificates, and issues related to your account.
     email: contact@example.com
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       # Secret resource that will be used to store the account's private key.
-      name: letsencrypt-staging-issuer-account-key
+      name: letsencrypt-issuer-account-key
     solvers:
     - dns01:
         webhook:
@@ -50,6 +50,8 @@ spec:
                 name: alidns-secret
 EOF
 ```
+
+> Note: The [acme-staging-v02](https://letsencrypt.org/docs/staging-environment/#) api: <https://acme-staging-v02.api.letsencrypt.org/directory> is only for testing purposes now.
 
 or you can set AccsessKey in webhook configuration directly (**use as your own risk**):
 
@@ -75,7 +77,7 @@ spec:
   - example.com
   - "*.example.com"
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt
     kind: ClusterIssuer
 EOF
 ```
