@@ -4,6 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cert-manager-webhook-alidns
+  namespace: cert-manager
   labels:
     app: cert-manager-webhook-alidns
     chart: cert-manager-webhook-alidns-0.1.0
@@ -100,6 +101,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cert-manager-webhook-alidns
+  namespace: cert-manager
   labels:
     app: cert-manager-webhook-alidns
     chart: cert-manager-webhook-alidns-0.1.0
@@ -121,6 +123,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cert-manager-webhook-alidns
+  namespace: cert-manager
   labels:
     app: cert-manager-webhook-alidns
     chart: cert-manager-webhook-alidns-0.1.0
@@ -141,7 +144,7 @@ spec:
       serviceAccountName: cert-manager-webhook-alidns
       containers:
         - name: cert-manager-webhook-alidns
-          image: "webhook:latest"
+          image: "fatalc/cert-manager-webhook-alidns:latest"
           imagePullPolicy: IfNotPresent
           args:
             - --tls-cert-file=/tls/tls.crt
@@ -221,7 +224,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: cert-manager-webhook-alidns-webhook-tls
-  namespace: "cert-manager"
+  namespace: cert-manager
   labels:
     app: cert-manager-webhook-alidns
     chart: cert-manager-webhook-alidns-0.1.0
@@ -259,7 +262,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: cert-manager-webhook-alidns-ca
-  namespace: "cert-manager"
+  namespace: cert-manager
   labels:
     app: cert-manager-webhook-alidns
     chart: cert-manager-webhook-alidns-0.1.0
