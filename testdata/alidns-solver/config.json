@@ -1,0 +1,9 @@
+{
+    "email": "",
+    "apiKeySecretRef": {
+        "name": "alidns-secret"
+    },
+    "regionID": "",
+    "accessKeyID": "",
+    "accessKeySecret": ""
+}

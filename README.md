@@ -1,54 +1,98 @@
-# ACME webhook example
+# ACME webhook for Alibaba Cloud DNS
 
 The ACME issuer type supports an optional 'webhook' solver, which can be used
-to implement custom DNS01 challenge solving logic.
+for Alibaba Cloud DNS.
 
-This is useful if you need to use cert-manager with a DNS provider that is not
-officially supported in cert-manager core.
+more details: https://cert-manager.io/docs/configuration/acme/dns01/webhook/
 
-## Why not in core?
+## Usage
 
-As the project & adoption has grown, there has been an influx of DNS provider
-pull requests to our core codebase. As this number has grown, the test matrix
-has become un-maintainable and so, it's not possible for us to certify that
-providers work to a sufficient level.
+Install webhook from allinone bundle or using helm chart under [deploy/cert-manager-webhook-alidns](deploy/cert-manager-webhook-alidns).
 
-By creating this 'interface' between cert-manager and DNS providers, we allow
-users to quickly iterate and test out new integrations, and then packaging
-those up themselves as 'extensions' to cert-manager.
+```sh
+# install cert-manager webhook
+kubectl apply -f https://raw.githubusercontent.com/fatalc/cert-manager-webhook-alidns/main/deploy/rendered-manifest.yaml
+```
 
-We can also then provide a standardised 'testing framework', or set of
-conformance tests, which allow us to validate the a DNS provider works as
-expected.
+[Obtain an AccessKey pair](https://www.alibabacloud.com/help/en/doc-detail/107708.htm) and create the AccessKey Secret.
 
-## Creating your own webhook
+```sh
+# create alidns aksk secret
+kubectl -n cert-manager create secret generic alidns-secret --from-literal="access-token=<AccessKey ID>" --from-literal="secret-key=<AccessKey Secret>"
+```
 
-Webhook's themselves are deployed as Kubernetes API services, in order to allow
-administrators to restrict access to webhooks with Kubernetes RBAC.
+Create the ACME issuer. for more information see <https://cert-manager.io/docs/configuration/acme/>
 
-This is important, as otherwise it'd be possible for anyone with access to your
-webhook to complete ACME challenge validations and obtain certificates.
+```sh
+cat <<EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # You must replace this email address with your own.
+    # Let's Encrypt will use this to contact you about expiring
+    # certificates, and issues related to your account.
+    email: contact@example.com
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      # Secret resource that will be used to store the account's private key.
+      name: letsencrypt-staging-issuer-account-key
+    solvers:
+    - dns01:
+        webhook:
+            groupName: dns.aliyun.com
+            solverName: alidns-solver
+            config:
+              regionId: ""                 # optional
+              secretKeySecretRef:
+                name: alidns-secret
+EOF
+```
 
-To make the set up of these webhook's easier, we provide a template repository
-that can be used to get started quickly.
+or you can set AccsessKey in webhook configuration directly (**use as your own risk**):
 
-### Creating your own repository
+```diff
+-              secretKeySecretRef:
+-                name: alidns-secret
++              accessKeyID: "<accessKeyID>"
++              accessKeySecret: "<accessKeySecret>"
+```
 
-### Running the test suite
+Issue a certificate(optional)
 
-All DNS providers **must** run the DNS01 provider conformance testing suite,
-else they will have undetermined behaviour when used with cert-manager.
+```sh
+cat <<EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: example-tls
+spec:
+  secretName: example-com-tls
+  commonName: example.com
+  dnsNames:
+  - example.com
+  - "*.example.com"
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+EOF
+```
 
-**It is essential that you configure and run the test suite when creating a
-DNS01 webhook.**
+## Build
 
-An example Go test file has been provided in [main_test.go](https://github.com/jetstack/cert-manager-webhook-example/blob/master/main_test.go).
+required: `golang 1.17` `buildah` `helm`
 
-You can run the test suite with:
+```sh
+make build
+make rendered-manifest.yaml
+```
+
+## Running the test suite
+
+update [alidns-secret](testdata/alidns-solver/alidns-secret.yaml) to your own secret
 
 ```bash
 $ TEST_ZONE_NAME=example.com. make test
 ```
-
-The example file has a number of areas you must fill in and replace with your
-own options in order for tests to pass.
