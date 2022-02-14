@@ -14,7 +14,7 @@ certManager:
 
 replicaCount: 1
 image:
-  repository: fatalc/cert-manager-webhook-alidns
+  repository: cnfatal/cert-manager-webhook-alidns
   tag: latest
   pullPolicy: IfNotPresent
 

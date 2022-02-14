@@ -224,7 +224,7 @@ spec:
       serviceAccountName: cert-manager-webhook-alidns
       containers:
         - name: cert-manager-webhook-alidns
-          image: "fatalc/cert-manager-webhook-alidns:latest"
+          image: "cnfatal/cert-manager-webhook-alidns:latest"
           imagePullPolicy: IfNotPresent
           args:
             - --tls-cert-file=/tls/tls.crt

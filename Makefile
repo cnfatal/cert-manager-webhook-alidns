@@ -1,7 +1,7 @@
 OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
-IMAGE_NAME := fatalc/cert-manager-webhook-alidns
+IMAGE_NAME := cnfatal/cert-manager-webhook-alidns
 IMAGE_TAG := latest
 
 OUT := $(shell pwd)/_out
