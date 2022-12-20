@@ -1,8 +1,11 @@
 OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
+IMAGE_REGISTRY := ghcr.io
 IMAGE_NAME := cnfatal/cert-manager-webhook-alidns
 IMAGE_TAG := latest
+
+FULL_IMAGE := ${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
 
 OUT := $(shell pwd)/_out
 
@@ -32,12 +35,12 @@ build:
 	CGO_ENABLED=0 go build -o bin/webhook -ldflags '-w -extldflags "-static"'
 
 docker:
-	docker buildx build -t $(IMAGE_NAME):$(IMAGE_TAG) --push .
+	docker buildx build -t $(FULL_IMAGE) --push .
 
 .PHONY: rendered-manifest.yaml
 rendered-manifest.yaml:
 	helm template \
-        --set image.repository=$(IMAGE_NAME) \
+        --set image.repository=${IMAGE_REGISTRY}/${IMAGE_NAME} \
         --set image.tag=$(IMAGE_TAG) \
 		--namespace=cert-manager \
 		cert-manager-webhook-alidns \
