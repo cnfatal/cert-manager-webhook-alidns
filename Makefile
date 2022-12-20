@@ -10,6 +10,8 @@ KUBEBUILDER_VERSION=2.3.2
 
 $(shell mkdir -p "$(OUT)")
 
+all: build docker
+
 test: _test/kubebuilder
 	go test -v .
 
@@ -27,10 +29,10 @@ clean-kubebuilder:
 	rm -Rf _test/kubebuilder
 
 build:
-	buildah bud -t $(IMAGE_NAME):$(IMAGE_TAG) .
+	CGO_ENABLED=0 go build -o bin/webhook -ldflags '-w -extldflags "-static"'
 
-push:
-	buildah push $(IMAGE_NAME):$(IMAGE_TAG) docker://$(IMAGE_NAME):$(IMAGE_TAG)
+docker:
+	docker buildx build -t $(IMAGE_NAME):$(IMAGE_TAG) --push .
 
 .PHONY: rendered-manifest.yaml
 rendered-manifest.yaml:
