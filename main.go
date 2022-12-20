@@ -205,8 +205,8 @@ func (c *aliDNSProviderSolver) Reconcile(ch *v1alpha1.ChallengeRequest) error {
 		return err
 	}
 
-	rr := strings.TrimSuffix(ch.ResolvedFQDN, "."+ch.ResolvedZone)
-	domain := util.UnFqdn(ch.ResolvedZone)
+	domain := baseDomain(util.UnFqdn(ch.ResolvedZone))
+	rr := strings.TrimSuffix(ch.ResolvedFQDN, "."+domain+".")
 	typ := "TXT" // ACME DNS-01 is always TXT
 
 	switch ch.Action {
@@ -217,6 +217,14 @@ func (c *aliDNSProviderSolver) Reconcile(ch *v1alpha1.ChallengeRequest) error {
 	default:
 		return fmt.Errorf("unsupported challenge action: %s", ch.Action)
 	}
+}
+
+func baseDomain(domain string) string {
+	splites := strings.Split(domain, ".")
+	if lens := len(splites); lens > 2 {
+		return splites[lens-2] + "." + splites[lens-1]
+	}
+	return domain
 }
 
 func createOrUpdateRecord(client *alidns.Client, typ, rr, domain, val string) error {
