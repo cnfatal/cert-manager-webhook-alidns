@@ -11,7 +11,7 @@ Install webhook from allinone bundle or using helm chart under [deploy/cert-mana
 
 ```sh
 # install cert-manager webhook
-kubectl apply -f https://raw.githubusercontent.com/fatalc/cert-manager-webhook-alidns/main/deploy/rendered-manifest.yaml
+kubectl apply -f https://raw.githubusercontent.com/cnfatal/cert-manager-webhook-alidns/main/deploy/rendered-manifest.yaml
 ```
 
 [Obtain an AccessKey pair](https://www.alibabacloud.com/help/en/doc-detail/107708.htm) and create the AccessKey Secret.

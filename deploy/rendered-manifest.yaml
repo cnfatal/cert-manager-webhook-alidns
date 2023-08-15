@@ -225,7 +225,7 @@ spec:
       containers:
         - name: cert-manager-webhook-alidns
           image: "ghcr.io/cnfatal/cert-manager-webhook-alidns:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - --tls-cert-file=/tls/tls.crt
             - --tls-private-key-file=/tls/tls.key

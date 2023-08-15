@@ -14,9 +14,9 @@ certManager:
 
 replicaCount: 1
 image:
-  repository: cnfatal/cert-manager-webhook-alidns
+  repository: ghcr.io/cnfatal/cert-manager-webhook-alidns
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 nameOverride: ""
 fullnameOverride: ""
