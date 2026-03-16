@@ -11,10 +11,11 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Ignore the built binary
+# Ignore the built binaries
 cert-manager-webhook-example
+cert-manager-webhook-alidns
 
 # Make artifacts
 _out
 _test
-bin
+bin/
